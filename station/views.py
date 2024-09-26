@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from station.models import Train, TrainType, Station
-from station.serializers import TrainSerializer, TrainTypeSerializer, StationSerializer
+from station.models import Train, TrainType, Station, Route
+from station.serializers import TrainSerializer, TrainTypeSerializer, StationSerializer, RouteSerializer
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
@@ -17,5 +17,10 @@ class TrainViewSet(viewsets.ModelViewSet):
 class StationViewSet(viewsets.ModelViewSet):
     queryset = Station.objects.all()
     serializer_class = StationSerializer
+
+
+class RouteViewSet(viewsets.ModelViewSet):
+    queryset = Route.objects.all()
+    serializer_class = RouteSerializer
 
 
