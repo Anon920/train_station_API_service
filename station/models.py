@@ -12,7 +12,7 @@ class Train(models.Model):
     name = models.CharField(max_length=100)
     cargo_num = models.PositiveIntegerField()
     places_in_cargo = models.PositiveIntegerField()
-    # train_type =
+    train_type = models.ForeignKey(TrainType, related_name="train_type", on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Train: {self.name} (id {self.id})"

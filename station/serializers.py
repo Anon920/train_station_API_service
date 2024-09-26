@@ -12,5 +12,5 @@ class TrainTypeSerializer(serializers.ModelSerializer):
 class TrainSerializer(serializers.ModelSerializer):
     class Meta:
         model = Train
-        fields = ("id", "name", "cargo_num", "places_in_cargo")
-        read_only_fields = ("id", )
+        fields = ("id", "name", "cargo_num", "places_in_cargo", "train_type")
+        read_only_fields = ("id",)
