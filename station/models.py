@@ -19,3 +19,15 @@ class Train(models.Model):
 
     class Meta:
         verbose_name_plural = "trains"
+
+
+class Station(models.Model):
+    name = models.CharField(max_length=100)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    def __str__(self):
+        return f"Station: {self.name} ({self.latitude} {self.longitude})"
+
+    class Meta:
+        verbose_name_plural = "stations"
