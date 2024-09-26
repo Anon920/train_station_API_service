@@ -31,3 +31,16 @@ class Station(models.Model):
 
     class Meta:
         verbose_name_plural = "stations"
+
+
+class Route(models.Model):
+    source = models.ForeignKey(Station, related_name="source", on_delete=models.CASCADE)
+    destination = models.ForeignKey(Station, related_name="destination", on_delete=models.CASCADE)
+    distance = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"Route: {self.source.name} - {self.destination.name}"
+
+    class Meta:
+        unique_together = (("source", "destination"),)
+
