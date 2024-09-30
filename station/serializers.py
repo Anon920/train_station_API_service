@@ -17,7 +17,14 @@ class TrainSerializer(serializers.ModelSerializer):
 
 
 class TrainListSerializer(TrainSerializer):
-    train_type = TrainTypeSerializer(many=False, read_only=True)
+    train_type = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="name",
+    )
+
+
+class TrainRetrieveSerializer(TrainSerializer):
+    train_type = TrainTypeSerializer(many=False)
 
 
 class StationSerializer(serializers.ModelSerializer):
