@@ -41,8 +41,19 @@ class RouteSerializer(serializers.ModelSerializer):
 
 
 class RouteListSerializer(RouteSerializer):
-    source = StationSerializer()
-    destination = StationSerializer()
+    source = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="name",
+    )
+    destination = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="name",
+    )
+
+
+class RouteRetrieveSerializer(RouteSerializer):
+    source = StationSerializer(many=False)
+    destination = StationSerializer(many=False)
 
 
 class JourneySerializer(serializers.ModelSerializer):
