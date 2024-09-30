@@ -44,3 +44,13 @@ class Route(models.Model):
     class Meta:
         unique_together = (("source", "destination"),)
 
+
+class Journey(models.Model):
+    route = models.ForeignKey(Route, related_name="route", on_delete=models.CASCADE)
+    train = models.ForeignKey(Train, related_name="train", on_delete=models.CASCADE)
+    departure_time = models.DateTimeField()
+    arrival_time = models.DateTimeField()
+
+    def __str__(self):
+        return f"Journey: {self.route} - {self.train.name}"
+
