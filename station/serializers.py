@@ -60,3 +60,13 @@ class JourneySerializer(serializers.ModelSerializer):
     class Meta:
         model = Journey
         fields = ("id", "route", "train", "departure_time", "arrival_time")
+
+
+class JourneyListSerializer(JourneySerializer):
+    route = serializers.SerializerMethodField()
+    train = serializers.CharField(source='train.name', read_only=True)
+
+    def get_route(self, obj):
+        return f"{obj.route.source.name} - {obj.route.destination.name}"
+
+
