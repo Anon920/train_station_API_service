@@ -10,10 +10,17 @@ class TrainTypeSerializer(serializers.ModelSerializer):
 
 
 class TrainSerializer(serializers.ModelSerializer):
+    train_type = TrainTypeSerializer(many=False, read_only=True)
+
     class Meta:
         model = Train
         fields = ("id", "name", "cargo_num", "places_in_cargo", "train_type")
-        read_only_fields = ("id",)
+
+
+class TrainListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Train
+        fields = ("id", "name", "cargo_num", "places_in_cargo", "train_type")
 
 
 class StationSerializer(serializers.ModelSerializer):
