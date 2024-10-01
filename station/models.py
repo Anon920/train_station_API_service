@@ -60,10 +60,10 @@ class Journey(models.Model):
     train = models.ForeignKey(Train, related_name="train", on_delete=models.CASCADE)
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
-    crew = models.ManyToManyField(Crew)
+    crew = models.ManyToManyField(Crew, related_name="journeys")
 
     def __str__(self):
-        return f"Journey: {self.route} - {self.train.name}"
+        return f"{self.route}. Train: {self.train.name}"
 
     def clean(self):
         if self.departure_time >= self.arrival_time:

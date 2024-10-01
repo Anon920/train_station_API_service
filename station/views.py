@@ -7,7 +7,7 @@ from station.serializers import TrainSerializer, TrainTypeSerializer, StationSer
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
-    queryset = TrainType.objects.all()
+    queryset = TrainType.objects.all().select_related()
     serializer_class = TrainTypeSerializer
 
 
@@ -29,7 +29,7 @@ class TrainViewSet(viewsets.ModelViewSet):
 
 
 class StationViewSet(viewsets.ModelViewSet):
-    queryset = Station.objects.all()
+    queryset = Station.objects.all().select_related()
     serializer_class = StationSerializer
 
 
