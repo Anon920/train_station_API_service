@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from station.models import Train, TrainType, Station, Route, Journey
 from station.serializers import TrainSerializer, TrainTypeSerializer, StationSerializer, RouteSerializer, \
     JourneySerializer, TrainListSerializer, RouteListSerializer, TrainRetrieveSerializer, RouteRetrieveSerializer, \
-    JourneyListSerializer
+    JourneyListSerializer, JourneyRetrieveSerializer
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
@@ -56,6 +56,8 @@ class JourneyViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return JourneyListSerializer
+        if self.action == "retrieve":
+            return JourneyRetrieveSerializer
         return JourneySerializer
 
     def get_queryset(self):
