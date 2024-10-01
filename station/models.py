@@ -43,11 +43,24 @@ class Route(models.Model):
         return f"Route: {self.source.name} - {self.destination.name}"
 
 
+class Crew(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+
 class Journey(models.Model):
     route = models.ForeignKey(Route, related_name="route", on_delete=models.CASCADE)
     train = models.ForeignKey(Train, related_name="train", on_delete=models.CASCADE)
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
+    crew = models.ManyToManyField(Crew)
 
     def __str__(self):
         return f"Journey: {self.route} - {self.train.name}"
