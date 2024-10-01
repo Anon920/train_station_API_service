@@ -39,6 +39,11 @@ class RouteSerializer(serializers.ModelSerializer):
         model = Route
         fields = ("id", "source", "destination", "distance")
 
+    def validate(self, attrs):
+        if attrs["destination"] == attrs["source"]:
+            raise serializers.ValidationError("The destination and source cannot be the same.")
+        return attrs
+
 
 class RouteListSerializer(RouteSerializer):
     source = serializers.SlugRelatedField(
@@ -69,4 +74,8 @@ class JourneyListSerializer(JourneySerializer):
     def get_route(self, obj):
         return f"{obj.route.source.name} - {obj.route.destination.name}"
 
+
+class JourneyRetrieveSerializer(JourneySerializer):
+    route = RouteRetrieveSerializer(many=False)
+    train = TrainRetrieveSerializer(many=False)
 
