@@ -10,7 +10,6 @@ class TrainTypeSerializer(serializers.ModelSerializer):
 
 
 class TrainSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Train
         fields = ("id", "name", "cargo_num", "places_in_cargo", "train_type")
@@ -34,7 +33,6 @@ class StationSerializer(serializers.ModelSerializer):
 
 
 class RouteSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Route
         fields = ("id", "source", "destination", "distance")
@@ -61,16 +59,16 @@ class RouteRetrieveSerializer(RouteSerializer):
     destination = StationSerializer(many=False)
 
 
-class CrewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Crew
-        fields = "id", "first_name", "last_name"
-
-
 class JourneySerializer(serializers.ModelSerializer):
     class Meta:
         model = Journey
         fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")
+
+
+class CrewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Crew
+        fields = "id", "first_name", "last_name"
 
 
 class JourneyListSerializer(JourneySerializer):
