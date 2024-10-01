@@ -1,8 +1,9 @@
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 
 class TrainType(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
@@ -22,7 +23,7 @@ class Train(models.Model):
 
 
 class Station(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
 
@@ -41,9 +42,6 @@ class Route(models.Model):
     def __str__(self):
         return f"Route: {self.source.name} - {self.destination.name}"
 
-    class Meta:
-        unique_together = (("source", "destination"),)
-
 
 class Journey(models.Model):
     route = models.ForeignKey(Route, related_name="route", on_delete=models.CASCADE)
@@ -54,3 +52,10 @@ class Journey(models.Model):
     def __str__(self):
         return f"Journey: {self.route} - {self.train.name}"
 
+    def clean(self):
+        if self.departure_time >= self.arrival_time:
+            raise ValidationError("Departure time cannot be later than arrival time")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
