@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework",
     "station",
-    "user"
+    "user",
+    "rest_framework.authtoken",
 ]
 
 AUTH_USER_MODEL = 'user.User'
