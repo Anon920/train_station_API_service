@@ -86,3 +86,15 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} by {self.user}"
+
+
+class Ticket(models.Model):
+    cargo = models.IntegerField()
+    seats = models.IntegerField()
+    journey = models.ForeignKey(Journey, related_name="journey", on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, related_name="order", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return (f"Order: {self.order}.\n"
+                f"{self.journey}\n"
+                f"{self.cargo} - {self.seats}")
