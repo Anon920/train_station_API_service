@@ -41,7 +41,6 @@ class AuthTokenSerializer(serializers.Serializer):
         trim_whitespace=False,
         write_only=True,
     )
-    token = serializers.CharField(label="Token", write_only=True)
 
     def validate(self, attrs):
         email = attrs.get("email")
