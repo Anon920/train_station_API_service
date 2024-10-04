@@ -1,5 +1,8 @@
+from django.contrib.auth.models import User
 from django.db import models
 from rest_framework.exceptions import ValidationError
+
+from train_station_API_service import settings
 
 
 class TrainType(models.Model):
@@ -72,3 +75,14 @@ class Journey(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
+
+
+class Order(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f"Order {self.id} by {self.user}"

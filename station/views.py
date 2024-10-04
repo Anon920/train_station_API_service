@@ -1,10 +1,10 @@
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets
 
-from station.models import Train, TrainType, Station, Route, Journey, Crew
+from station.models import Train, TrainType, Station, Route, Journey, Crew, Order
 from station.serializers import TrainSerializer, TrainTypeSerializer, StationSerializer, RouteSerializer, \
     JourneySerializer, TrainListSerializer, RouteListSerializer, TrainRetrieveSerializer, RouteRetrieveSerializer, \
-    JourneyListSerializer, JourneyRetrieveSerializer, CrewSerializer
+    JourneyListSerializer, JourneyRetrieveSerializer, CrewSerializer, OrderSerializer
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
@@ -93,7 +93,7 @@ class RouteViewSet(viewsets.ModelViewSet):
 
 
 class CrewViewSet(viewsets.ModelViewSet):
-    queryset = Crew.objects.all()
+    queryset = Crew.objects.all().select_related()
     serializer_class = CrewSerializer
 
 
@@ -112,3 +112,14 @@ class JourneyViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             queryset = queryset.select_related("route", "train")
         return queryset
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)

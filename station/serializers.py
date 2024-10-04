@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from station.models import Train, TrainType, Station, Route, Journey, Crew
+from station.models import Train, TrainType, Station, Route, Journey, Crew, Order
 
 
 class TrainTypeSerializer(serializers.ModelSerializer):
@@ -88,3 +88,11 @@ class JourneyRetrieveSerializer(JourneySerializer):
     route = RouteRetrieveSerializer(many=False)
     train = TrainRetrieveSerializer(many=False)
     crew = CrewSerializer(many=True)
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source="user.username", read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ("id", "created_at", "user")
