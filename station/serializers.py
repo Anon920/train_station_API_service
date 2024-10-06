@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 
 from station.models import Train, TrainType, Station, Route, Journey, Crew, Order, Ticket
@@ -60,9 +61,12 @@ class RouteRetrieveSerializer(RouteSerializer):
 
 
 class JourneySerializer(serializers.ModelSerializer):
+    departure_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    arrival_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+
     class Meta:
         model = Journey
-        fields = ("id", "route", "train", "departure_time", "arrival_time")
+        fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")
 
 
 class CrewSerializer(serializers.ModelSerializer):
@@ -83,19 +87,11 @@ class JourneyListSerializer(JourneySerializer):
     def get_route(self, obj):
         return f"{obj.route.source.name} - {obj.route.destination.name}"
 
-    class Meta:
-        model = Journey
-        fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")
-
 
 class JourneyRetrieveSerializer(JourneySerializer):
     route = RouteRetrieveSerializer(many=False)
     train = TrainRetrieveSerializer(many=False)
-    crew = CrewSerializer(many=True)
-
-    class Meta:
-        model = Journey
-        fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")
+    crew = CrewSerializer(many=True, read_only=True)
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -107,15 +103,47 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("id", "cargo", "seats", "journey")
+
+
+class TicketListSerializer(TicketSerializer):
+    journey = serializers.CharField(source="journey.route", read_only=True)
+    order = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="name",
+    )
 
     class Meta:
         model = Ticket
         fields = ("id", "cargo", "seats", "journey", "order")
 
+    def validate(self, attrs):
+        journey = attrs.get('journey')
+        seats = attrs.get('seats')
+        cargo = attrs.get('cargo')
 
-class TicketListSerializer(TicketSerializer):
-    journey = serializers.CharField(source="journey.name")
-    order = serializers.SerializerMethodField()
+        if Ticket.objects.filter(journey=journey, seats=seats).exists():
+            raise serializers.ValidationError(f"Seat {seats} already exist.")
 
-    def get_order(self, obj):
-        return f"{obj.order.id} - {obj.order.user.username}"
+        if journey:
+            available_cargo = journey.train.available_cargo
+
+            if cargo > available_cargo:
+                raise serializers.ValidationError(f"Cargo {cargo} exceeds available capacity of {available_cargo}.")
+
+        return attrs
+
+
+class TicketRetrieveSerializer(TicketListSerializer):
+    journey = JourneyRetrieveSerializer(many=False)
+    order = OrderSerializer(many=False)
+
+
+class OrderListSerializer(OrderSerializer):
+    tickets = TicketListSerializer(many=True, required=False)
+
+    class Meta:
+        model = Order
+        fields = ("id", "created_at", "user", "tickets")
