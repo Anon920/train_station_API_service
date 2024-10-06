@@ -16,7 +16,7 @@ class Train(models.Model):
     name = models.CharField(max_length=100)
     cargo_num = models.PositiveIntegerField()
     places_in_cargo = models.PositiveIntegerField()
-    train_type = models.ForeignKey(TrainType, related_name="train_type", on_delete=models.CASCADE)
+    train_type = models.ForeignKey(TrainType, related_name="trains", on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Train: {self.name} (id {self.id})"
@@ -31,15 +31,15 @@ class Station(models.Model):
     longitude = models.FloatField()
 
     def __str__(self):
-        return f"Station: {self.name} ({self.latitude} {self.longitude})"
+        return f"{self.name} ({self.latitude} {self.longitude})"
 
     class Meta:
         verbose_name_plural = "stations"
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Station, related_name="source", on_delete=models.CASCADE)
-    destination = models.ForeignKey(Station, related_name="destination", on_delete=models.CASCADE)
+    source = models.ForeignKey(Station, related_name="source_routes", on_delete=models.CASCADE)
+    destination = models.ForeignKey(Station, related_name="destination_routes", on_delete=models.CASCADE)
     distance = models.PositiveIntegerField()
 
     def __str__(self):
@@ -66,14 +66,13 @@ class Journey(models.Model):
     crew = models.ManyToManyField(Crew, related_name="journeys")
 
     def __str__(self):
-        return f"{self.route}. Train: {self.train.name}"
+        return (f"Journey from {self.route.source} to {self.route.destination}. "
+                f"Time: {self.departure_time.strftime("%Y-%m-%d %H:%M:%S")} - "
+                f"{self.arrival_time.strftime("%Y-%m-%d %H:%M:%S")}")
 
     def clean(self):
         if self.departure_time >= self.arrival_time:
             raise ValidationError("Departure time cannot be later than arrival time")
-
-    def name(self):
-        return f"{self.route}. Train: {self.train.name}"
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -82,7 +81,7 @@ class Journey(models.Model):
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders")
 
     class Meta:
         ordering = ('-created_at',)
@@ -90,14 +89,16 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id} by {self.user}"
 
+    @property
+    def name(self):
+        return f"Order {self.id} by {self.user}"
+
 
 class Ticket(models.Model):
     cargo = models.IntegerField()
     seats = models.IntegerField()
-    journey = models.ForeignKey(Journey, related_name="journey", on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, related_name="order", on_delete=models.CASCADE)
+    journey = models.ForeignKey(Journey, related_name="tickets", on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, related_name="tickets", on_delete=models.CASCADE)
 
     def __str__(self):
-        return (f"Order: {self.order}.\n"
-                f"{self.journey}\n"
-                f"{self.cargo} - {self.seats}")
+        return f"Ticket {self.id} for {self.journey} (Seats: {self.seats})"
