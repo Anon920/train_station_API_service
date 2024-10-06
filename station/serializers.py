@@ -62,7 +62,7 @@ class RouteRetrieveSerializer(RouteSerializer):
 class JourneySerializer(serializers.ModelSerializer):
     class Meta:
         model = Journey
-        fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")
+        fields = ("id", "route", "train", "departure_time", "arrival_time")
 
 
 class CrewSerializer(serializers.ModelSerializer):
@@ -83,11 +83,19 @@ class JourneyListSerializer(JourneySerializer):
     def get_route(self, obj):
         return f"{obj.route.source.name} - {obj.route.destination.name}"
 
+    class Meta:
+        model = Journey
+        fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")
+
 
 class JourneyRetrieveSerializer(JourneySerializer):
     route = RouteRetrieveSerializer(many=False)
     train = TrainRetrieveSerializer(many=False)
     crew = CrewSerializer(many=True)
+
+    class Meta:
+        model = Journey
+        fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -99,6 +107,15 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Ticket
         fields = ("id", "cargo", "seats", "journey", "order")
+
+
+class TicketListSerializer(TicketSerializer):
+    journey = serializers.CharField(source="journey.name")
+    order = serializers.SerializerMethodField()
+
+    def get_order(self, obj):
+        return f"{obj.order.id} - {obj.order.user.username}"

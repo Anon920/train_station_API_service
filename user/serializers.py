@@ -6,7 +6,7 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ("id", "email", "password", "is_staff")
+        fields = ("id", "username", "email", "password", "is_staff")
         read_only_fields = ("id", "is_staff")
         extra_kwargs = {
             "password": {
@@ -22,7 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
         return get_user_model().objects.create_user(**validated_data)
 
     def update(self, instance, validated_data):
-        """update user with encrypted password"""
         password = validated_data.pop("password", None)
         user = super().update(instance, validated_data)
 
@@ -34,7 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AuthTokenSerializer(serializers.Serializer):
-    email = serializers.CharField(label="Email", write_only=True)
+    username = serializers.CharField(label="Username", write_only=True)
     password = serializers.CharField(
         label="Password",
         style={"input_type": "password"},
@@ -43,12 +42,12 @@ class AuthTokenSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        email = attrs.get("email")
+        username = attrs.get("username")
         password = attrs.get("password")
 
-        if email and password:
+        if username and password:
             user = authenticate(
-                request=self.context.get("request"), email=email, password=password
+                request=self.context.get("request"), username=username, password=password
             )
             if not user:
                 msg = _("Unable to authenticate with provided credentials.")

@@ -72,6 +72,9 @@ class Journey(models.Model):
         if self.departure_time >= self.arrival_time:
             raise ValidationError("Departure time cannot be later than arrival time")
 
+    def name(self):
+        return f"{self.route}. Train: {self.train.name}"
+
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
@@ -79,7 +82,7 @@ class Journey(models.Model):
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
 
     class Meta:
         ordering = ('-created_at',)
