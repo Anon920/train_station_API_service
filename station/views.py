@@ -1,20 +1,22 @@
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from station.models import Train, TrainType, Station, Route, Journey, Crew, Order, Ticket
 from station.serializers import TrainSerializer, TrainTypeSerializer, StationSerializer, RouteSerializer, \
     JourneySerializer, TrainListSerializer, RouteListSerializer, TrainRetrieveSerializer, RouteRetrieveSerializer, \
     JourneyListSerializer, JourneyRetrieveSerializer, CrewSerializer, OrderSerializer, TicketSerializer, \
-    TicketListSerializer
+    TicketListSerializer, TicketRetrieveSerializer, OrderListSerializer
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
-    queryset = TrainType.objects.all().select_related()
+    queryset = TrainType.objects.all()
     serializer_class = TrainTypeSerializer
 
 
 class TrainViewSet(viewsets.ModelViewSet):
-    queryset = Train.objects.all().select_related()
+    queryset = Train.objects.all().select_related("train_type")
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -117,21 +119,49 @@ class JourneyViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return OrderListSerializer
+        return OrderSerializer
+
+    def create(self, request, *args, **kwargs):
+        return Response({"detail": "POST method is not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        user = self.request.user
+        if user.is_staff:
+            return Order.objects.all()
+        else:
+            return Order.objects.filter(user=self.request.user)
 
 
 class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.all().select_related()
+    queryset = Ticket.objects.all().select_related("journey", "order")
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == 'list':
             return TicketListSerializer
-        # if self.action == "retrieve":
-        #     return JourneyRetrieveSerializer
+        elif self.action == "retrieve":
+            return TicketRetrieveSerializer
         return TicketSerializer
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        journey = serializer.validated_data['journey']
+
+        existing_order = Order.objects.filter(user=user).first()
+
+        if existing_order and Ticket.objects.filter(order=existing_order, journey=journey).exists():
+            serializer.save(order=existing_order)
+        else:
+            new_order = Order.objects.create(user=user)
+            serializer.save(order=new_order)
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Ticket.objects.all()
+        else:
+            return Ticket.objects.filter(order__user=user)
