@@ -67,8 +67,8 @@ class Journey(models.Model):
 
     def __str__(self):
         return (f"Journey from {self.route.source} to {self.route.destination}. "
-                f"Time: {self.departure_time.strftime("%Y-%m-%d %H:%M:%S")} - "
-                f"{self.arrival_time.strftime("%Y-%m-%d %H:%M:%S")}")
+                f"Time: {self.departure_time.strftime('%Y-%m-%d %H:%M:%S')} - "
+                f"{self.arrival_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
     def clean(self):
         if self.departure_time >= self.arrival_time:
