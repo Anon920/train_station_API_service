@@ -42,3 +42,7 @@ docker-compose up
 
 - Documentation available via /api/v1/doc/swagger/
 
+## DB-structure diagram:
+
+[train_API_staion.drawio](media_git%2Ftrain_API_staion.drawio)
+
