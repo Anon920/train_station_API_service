@@ -44,5 +44,4 @@ docker-compose up
 
 ## DB-structure diagram:
 
-[train_API_staion.drawio](media_git%2Ftrain_API_staion.drawio)
-
+![train_API_staion.jpg](media_git%2Ftrain_API_staion.jpg)
