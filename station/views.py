@@ -3,11 +3,31 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from station.models import Train, TrainType, Station, Route, Journey, Crew, Order, Ticket
-from station.serializers import TrainSerializer, TrainTypeSerializer, StationSerializer, RouteSerializer, \
-    JourneySerializer, TrainListSerializer, RouteListSerializer, TrainRetrieveSerializer, RouteRetrieveSerializer, \
-    JourneyListSerializer, JourneyRetrieveSerializer, CrewSerializer, OrderSerializer, TicketSerializer, \
-    TicketListSerializer, TicketRetrieveSerializer, OrderListSerializer
+from station.models import (Train,
+                            TrainType,
+                            Station,
+                            Route,
+                            Journey,
+                            Crew,
+                            Order,
+                            Ticket)
+from station.serializers import (TrainSerializer,
+                                 TrainTypeSerializer,
+                                 StationSerializer,
+                                 RouteSerializer,
+                                 JourneySerializer,
+                                 TrainListSerializer,
+                                 RouteListSerializer,
+                                 TrainRetrieveSerializer,
+                                 RouteRetrieveSerializer,
+                                 JourneyListSerializer,
+                                 JourneyRetrieveSerializer,
+                                 CrewSerializer,
+                                 OrderSerializer,
+                                 TicketSerializer,
+                                 TicketListSerializer,
+                                 TicketRetrieveSerializer,
+                                 OrderListSerializer)
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
