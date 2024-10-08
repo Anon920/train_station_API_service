@@ -1,5 +1,5 @@
 services:
-  train:
+  app:
     build:
       context: .
     env_file:
