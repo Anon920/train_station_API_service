@@ -138,3 +138,29 @@ class AuthenticatedTrainStationApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_filter_train_by_train_type(self):
+        train_type_1 = TrainType.objects.create(name="Test train1")
+        train_type_2 = TrainType.objects.create(name="Test train2")
+
+        train_1 = Train.objects.create(
+            name="Train A",
+            cargo_num=150,
+            places_in_cargo=10,
+            train_type=train_type_1
+        )
+
+        train_2 = Train.objects.create(
+            name="Train B",
+            cargo_num=150,
+            places_in_cargo=10,
+            train_type=train_type_2
+        )
+
+        res = self.client.get(TRAIN_URL, {'train_type': train_type_1.id})
+
+        trains = Train.objects.filter(train_type=train_type_1)
+        serializer = TrainListSerializer(trains, many=True)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
