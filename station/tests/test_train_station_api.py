@@ -11,6 +11,7 @@ from station.serializers import StationSerializer, TrainListSerializer, TrainRet
 
 STATION_URL = reverse("station:station-list")
 TRAIN_URL = reverse("station:train-list")
+ROUTE_URL = reverse("station:route-list")
 
 
 def sample_train(**params):
@@ -164,3 +165,27 @@ class AuthenticatedTrainStationApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+
+class AdminTrainStationApiTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            "admin@admin.com", "testadminpass", is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_create_station(self):
+        payload = {
+            "name": "Test station",
+            "latitude": 50,
+            "longitude": 40.4,
+        }
+
+        res = self.client.post(STATION_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        station = Station.objects.get(id=res.data["id"])
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(station, key))
+
