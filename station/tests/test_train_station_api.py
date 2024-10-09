@@ -1,13 +1,14 @@
-from datetime import datetime
-
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from station.models import TrainType, Train, Station, Route, Crew, Journey
-from station.serializers import StationSerializer, TrainListSerializer, TrainRetrieveSerializer, RouteListSerializer
+from station.models import TrainType, Train, Station, Route
+from station.serializers import (StationSerializer,
+                                 TrainListSerializer,
+                                 TrainRetrieveSerializer,
+                                 RouteListSerializer)
 
 STATION_URL = reverse("station:station-list")
 TRAIN_URL = reverse("station:train-list")
@@ -36,38 +37,6 @@ def sample_station(**params):
     }
     defaults.update(params)
     return Station.objects.create(**defaults)
-
-
-def sample_route(**params):
-    defaults = {
-        "source": sample_station(),
-        "destination": sample_station(),
-        "distance": 1000,
-    }
-    defaults.update(params)
-    return Route.objects.create(**defaults)
-
-
-def sample_crew(**params):
-    defaults = {
-        "first_name": "John",
-        "last_name": "Doe"
-    }
-    defaults.update(params)
-    return Crew.objects.create(**defaults)
-
-
-def sample_journey(**params):
-    defaults = {
-        "route": sample_route(),
-        "train": sample_train(),
-        "departure_time": datetime(2024, 10, 8, 23, 0),
-        "arrival_time": datetime(2024, 10, 9, 10, 0),
-    }
-    defaults.update(params)
-    journey = Journey.objects.create(**defaults)
-    journey.crew.set([sample_crew()])
-    return journey
 
 
 class UnauthenticatedTrainStationApiTests(TestCase):
