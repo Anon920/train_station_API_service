@@ -204,3 +204,26 @@ class AdminTrainStationApiTests(TestCase):
         station = Station.objects.get(id=res.data["id"])
         for key in payload.keys():
             self.assertEqual(payload[key], getattr(station, key))
+
+    def test_create_train(self):
+        train_type = TrainType.objects.create(name="Faster")
+
+        payload = {
+            "name": "Test train",
+            "cargo_num": 150,
+            "places_in_cargo": 10,
+            "train_type": train_type.id,
+        }
+
+        res = self.client.post(TRAIN_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        train = Train.objects.get(id=res.data["id"])
+
+        for key in payload.keys():
+            if key == "train_type":
+                self.assertEqual(train.train_type.id, payload[key])
+            else:
+                self.assertEqual(payload[key], getattr(train, key))
+
