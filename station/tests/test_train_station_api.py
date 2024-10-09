@@ -113,14 +113,14 @@ class AuthenticatedTrainStationApiTests(TestCase):
         train_type_1 = TrainType.objects.create(name="Test train1")
         train_type_2 = TrainType.objects.create(name="Test train2")
 
-        train_1 = Train.objects.create(
+        Train.objects.create(
             name="Train A",
             cargo_num=150,
             places_in_cargo=10,
             train_type=train_type_1
         )
 
-        train_2 = Train.objects.create(
+        Train.objects.create(
             name="Train B",
             cargo_num=150,
             places_in_cargo=10,
@@ -195,4 +195,3 @@ class AdminTrainStationApiTests(TestCase):
                 self.assertEqual(train.train_type.id, payload[key])
             else:
                 self.assertEqual(payload[key], getattr(train, key))
-
